@@ -1,30 +1,243 @@
-# slow-moving-inventory-clustering-and-optimization
+# AI-Driven Slow-Moving Inventory Detection and Optimization System
 
 ##  Project Overview
-This repository provides an end-to-end pipeline for managing **slow-moving and intermittent demand inventory**, utilizing the **M5 Competition dataset**. 
 
-Managing slow-moving items is a critical challenge in warehouse operations due to high demand uncertainty and holding costs. This project implements a **Divide-and-Conquer strategy** to segment demand patterns and apply specialized forecasting models to optimize inventory policies.
+This project develops an end-to-end intelligent system for detecting slow-moving and censored demand patterns and optimizing inventory policies.
 
-##  Core Pipeline (The "Clustering-to-Strategy" Workflow)
-The framework consists of three integrated modules:
+It integrates:
 
-1.  **Demand Pattern Clustering**: 
-    * Utilizes K-Means and CNN-Transformer autoencoders to isolate **slow-moving (intermittent)** SKUs from high-rotation items.
-    * Identifies 7 distinct demand clusters to enable targeted management.
+- Feature Engineering (Statistical + Temporal Representation)
+- Unsupervised Clustering (K-Means, multi-K analysis)
+- Demand Pattern Recognition
+- Forecasting (Baseline + Pattern-aware)
+- Inventory Policy Optimization (Pattern-aware)
 
-2.  **Specialized Forecasting Engine**:
-    * Implements a multi-model approach: **Croston’s Method** for sparse data, **Prophet** for seasonality, and **LightGBM** for non-linear trends.
-    * Significantly improves accuracy over traditional baseline models (SMA).
+The goal is to transform raw sales data into actionable inventory decisions.
 
-3.  **Inventory Policy Optimization**:
-    * Quantifies the financial impact by calculating **Safety Stock (SS)** requirements based on forecast error (RMSE).
-    * Demonstrates substantial cost reductions in holding costs for low-rotation inventory.
+---
 
-##  Key Research Impacts
-* **Cost Efficiency**: Achieved a quantifiable reduction in safety stock levels while maintaining service targets.
-* **Operational Insight**: Proves that SKU-level granularity in clustering leads to more robust warehouse decision-making.
+##  Business Problem
 
-##  Getting Started
-1. **Prerequisites**: `pip install pandas numpy lightgbm matplotlib`
-2. **Execution**: Run the main pipeline via `python main.py`
-3. **Evaluation**: Check `/results` folder for detailed SKU-level metrics and financial impact reports.
+In supply chain management, slow-moving and intermittent demand items are difficult to manage due to:
+
+- High demand uncertainty
+- Long zero-demand periods
+- Demand bursts
+- Overstock and stockout risks
+
+Traditional methods treat all SKUs similarly, leading to inefficient inventory policies.
+
+ This project addresses:
+
+> **How to identify demand patterns and optimize inventory decisions accordingly**
+
+---
+
+##  Solution Overview
+
+The system follows a structured pipeline:
+
+Sales Data
+   ↓
+Feature Extraction (Statistical + Temporal)
+   ↓
+Feature Fusion
+   ↓
+Clustering (Multi-K KMeans)
+   ↓
+Pattern Identification
+   ↓
+Forecasting (Baseline + Pattern-aware)
+   ↓
+Inventory Policy Optimization
+
+---
+
+##  Methodology
+
+### 1. Feature Engineering
+- Statistical features (mean, std, CV, zero-ratio)
+- Temporal features (learned representation)
+- Feature fusion (hybrid representation)
+
+---
+
+### 2. Clustering
+- KMeans clustering (K=3~8)
+- Multiple runs for stability
+- Evaluation metrics:
+  - Silhouette Score
+  - Davies-Bouldin Index
+  - Calinski-Harabasz Index
+
+---
+
+### 3. Pattern Recognition
+
+Each cluster is interpreted as a demand pattern:
+
+| Pattern       | Description |
+|--------------|------------|
+| Smooth       | Stable demand |
+| Intermittent | Many zero-demand periods |
+| Burst        | Sudden spikes |
+| Volatile     | High variability |
+
+---
+
+### 4. Forecasting
+
+Two approaches are compared:
+
+- Baseline (moving average)
+- Pattern-aware forecasting
+
+Evaluation metrics:
+- WAPE
+- RMSE
+
+---
+
+### 5. Inventory Policy Optimization (Core Contribution)
+
+A pattern-aware optimization module is introduced:
+
+- Dynamic service level selection
+- Safety stock optimization
+- Reorder point calculation
+- Order-up-to level optimization
+- EOQ-based order quantity estimation
+
+Different demand patterns use different cost structures:
+
+| Pattern       | Strategy |
+|--------------|--------|
+| Intermittent | Conservative inventory |
+| Burst        | Higher safety stock |
+| Smooth       | Stable replenishment |
+| Volatile     | High resilience buffer |
+
+---
+
+##  Project Structure
+
+M5-CENSORED-DEMAND-PATTERNS/
+├─ data/
+│  ├─ raw/
+│  └─ processed/
+│     └─ static_features_12d.csv
+│
+├─ results/
+│  ├─ clustering/
+│  ├─ forecasting/
+│  └─ decision/
+│
+├─ src/
+│  ├─ data/
+│  ├─ features/
+│  ├─ clustering/
+│  ├─ forecasting/
+│  ├─ decision/
+│  └─ optimization/
+│
+├─ main.py
+├─ requirements.txt
+└─ README.md
+
+---
+
+##  How to Run
+
+### 1. Install dependencies
+
+pip install -r requirements.txt
+
+---
+
+### 2. Run full pipeline
+
+python main.py
+
+---
+
+### 3. Optional modules
+
+python src/forecasting/run_forecasting.py
+python src/forecasting/train_lightgbm.py
+python src/decision/calc_final_inventory.py
+
+---
+
+##  Key Outputs
+
+### Clustering
+- cluster_assignments_k*.csv
+- cluster_pattern_summary_k7.csv
+- cluster_patterns_k7.png
+
+### Forecasting
+- evaluation_metrics_by_sku.csv
+- evaluation_summary_by_cluster.csv
+- final_comparison_with_lgbm.csv
+
+### Inventory Decision & Optimization
+- inventory_decision_k7.csv
+
+Includes:
+- safety stock (rule-based)
+- optimized safety stock
+- reorder point
+- optimal order quantity
+- estimated total cost
+
+---
+
+##  Key Results
+
+- Demand patterns can be effectively segmented using hybrid features
+- Pattern-aware forecasting improves performance over baseline
+- Inventory policies vary significantly across patterns
+- Optimization reduces unnecessary inventory while maintaining service levels
+
+---
+
+##  Key Contributions
+
+1. Hybrid feature representation combining statistical and temporal features  
+2. Multi-resolution clustering framework for demand pattern identification  
+3. Integration of clustering with forecasting performance evaluation  
+4. Pattern-aware inventory policy optimization (core contribution)  
+5. End-to-end pipeline from data to decision  
+
+---
+
+##  Skills Demonstrated
+
+- Time Series Analysis
+- Clustering (KMeans)
+- Feature Engineering
+- Demand Forecasting
+- Inventory Optimization
+- Supply Chain Analytics
+- Python (Pandas, NumPy, Scikit-learn, LightGBM)
+
+---
+
+##  Related Project
+
+This project focuses on SKU-level inventory intelligence.
+
+Complementary project:
+Multi-Warehouse Replenishment Optimization (network-level optimization)
+
+Together, they form a complete supply chain decision framework:
+- Demand pattern recognition
+- SKU policy optimization
+- Network-level replenishment optimization
+
+---
+
+##  Author
+
+Andrea Kang  
+Supply Chain & AI Researcher
